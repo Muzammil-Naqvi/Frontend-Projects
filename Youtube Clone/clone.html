@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>YourTube</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0f0f;
+      --surface: #212121;
+      --surface2: #272727;
+      --border: #3f3f3f;
+      --text: #f1f1f1;
+      --text-muted: #aaaaaa;
+      --red: #ff0000;
+      --chip-bg: #272727;
+      --chip-active: #f1f1f1;
+      --chip-active-text: #0f0f0f;
+      --sidebar-width: 240px;
+      --header-height: 56px;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--header-height);
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 100;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .menu-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--text); padding: 8px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .menu-btn:hover { background: var(--surface2); }
+
+    .logo {
+      display: flex; align-items: center; gap: 4px;
+      text-decoration: none;
+    }
+    .logo-icon {
+      background: var(--red);
+      border-radius: 6px;
+      width: 34px; height: 24px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-icon svg { fill: white; width: 16px; }
+    .logo-text {
+      font-size: 18px; font-weight: 700;
+      color: var(--text); letter-spacing: -0.5px;
+    }
+    .logo-text span { color: var(--red); }
+
+    /* Search bar */
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      flex: 1;
+      max-width: 600px;
+    }
+    .search-bar input {
+      flex: 1;
+      padding: 8px 16px;
+      background: #121212;
+      border: 1px solid var(--border);
+      border-right: none;
+      border-radius: 20px 0 0 20px;
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: 'Roboto', sans-serif;
+    }
+    .search-bar input:focus { border-color: #1c62b9; }
+    .search-bar input::placeholder { color: var(--text-muted); }
+    .search-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-left: none;
+      border-radius: 0 20px 20px 0;
+      padding: 8px 20px;
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.15s;
+      display: flex; align-items: center;
+    }
+    .search-btn:hover { background: #3f3f3f; }
+    .mic-btn {
+      background: var(--surface2);
+      border: none;
+      border-radius: 50%;
+      width: 40px; height: 40px;
+      margin-left: 8px;
+      color: var(--text);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .mic-btn:hover { background: #3f3f3f; }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .icon-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--text); width: 40px; height: 40px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s; position: relative;
+    }
+    .icon-btn:hover { background: var(--surface2); }
+    .notif-badge {
+      position: absolute; top: 6px; right: 6px;
+      background: var(--red); color: white;
+      font-size: 10px; font-weight: 700;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .sign-in-btn {
+      display: flex; align-items: center; gap: 6px;
+      background: none;
+      border: 1px solid #3ea6ff;
+      color: #3ea6ff;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 14px; font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+      font-family: 'Roboto', sans-serif;
+    }
+    .sign-in-btn:hover { background: rgba(62,166,255,0.1); }
+
+    /* ── SIDEBAR ── */
+    .layout {
+      display: flex;
+      margin-top: var(--header-height);
+    }
+
+    aside {
+      width: var(--sidebar-width);
+      position: fixed;
+      top: var(--header-height);
+      bottom: 0;
+      left: 0;
+      overflow-y: auto;
+      padding: 12px 0;
+      scrollbar-width: none;
+    }
+    aside::-webkit-scrollbar { display: none; }
+
+    .nav-section {
+      padding: 0 0 8px 0;
+      border-bottom: 1px solid #1f1f1f;
+      margin-bottom: 8px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 400;
+      transition: background 0.15s;
+      text-decoration: none;
+      margin: 0 8px;
+    }
+    .nav-item:hover { background: var(--surface2); }
+    .nav-item.active {
+      background: var(--surface2);
+      font-weight: 500;
+    }
+    .nav-item svg { flex-shrink: 0; }
+
+    .nav-section-title {
+      padding: 8px 20px 4px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    /* ── MAIN CONTENT ── */
+    main {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      padding: 16px 24px;
+    }
+
+    /* Chips */
+    .chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 16px;
+      flex-wrap: nowrap;
+      position: sticky;
+      top: var(--header-height);
+      background: var(--bg);
+      padding-top: 12px;
+      z-index: 10;
+    }
+    .chips::-webkit-scrollbar { display: none; }
+
+    .chip {
+      background: var(--chip-bg);
+      color: var(--text);
+      border: none;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: 'Roboto', sans-serif;
+      transition: background 0.15s;
+    }
+    .chip:hover { background: #3f3f3f; }
+    .chip.active {
+      background: var(--chip-active);
+      color: var(--chip-active-text);
+      font-weight: 500;
+    }
+
+    /* Video Grid */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px 12px;
+    }
+
+    .video-card {
+      cursor: pointer;
+    }
+    .video-card:hover .thumbnail img {
+      transform: scale(1.03);
+    }
+
+    .thumbnail {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--surface);
+    }
+    .thumbnail img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.2s ease;
+      display: block;
+    }
+    .duration {
+      position: absolute;
+      bottom: 6px; right: 6px;
+      background: rgba(0,0,0,0.85);
+      color: white;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+    .live-badge {
+      position: absolute;
+      bottom: 6px; right: 6px;
+      background: var(--red);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .video-info {
+      display: flex;
+      gap: 10px;
+      padding: 10px 0 4px;
+    }
+    .channel-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--surface);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .channel-avatar img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .video-meta { flex: 1; }
+    .video-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .channel-name {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .verified {
+      display: inline-flex;
+      width: 14px; height: 14px;
+      background: var(--text-muted);
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+    }
+    .verified svg { width: 8px; fill: #0f0f0f; }
+    .video-stats {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Shimmer placeholder thumbnails */
+    .thumb-placeholder {
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #3f3f3f; border-radius: 4px; }
+
+    /* SVG icons inline */
+    svg { display: inline-block; vertical-align: middle; }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="header-left">
+    <button class="menu-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M3 18h18v-2H3zm0-5h18v-2H3zm0-7v2h18V6z"/>
+      </svg>
+    </button>
+    <a class="logo" href="#">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6zm11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 1.86-.14 3.23-.44 4.17-.27.83-.7 1.27-1.32 1.54-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 18c-3.43 0-5.57-.14-6.43-.44-.62-.27-1.05-.71-1.32-1.54-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-1.86.14-3.23.44-4.17.27-.83.7-1.27 1.32-1.54.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 6c3.43 0 5.57.14 6.43.44.62.27 1.05.71 1.32 1.54z"/></svg>
+      </div>
+      <span class="logo-text">Your<span>Tube</span></span>
+    </a>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" placeholder="Search" />
+    <button class="search-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+      </svg>
+    </button>
+    <button class="mic-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="header-right">
+    <button class="icon-btn" title="Create">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4zM14 13h-3v3H9v-3H6v-2h3V8h2v3h3v2z"/>
+      </svg>
+    </button>
+    <button class="icon-btn" title="Notifications">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+      </svg>
+      <span class="notif-badge">9</span>
+    </button>
+    <button class="sign-in-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+      </svg>
+      Sign in
+    </button>
+  </div>
+</header>
+
+<!-- ── LAYOUT ── -->
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside>
+    <div class="nav-section">
+      <a class="nav-item active" href="#">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        Home
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M10 8l6 4-6 4V8zm11-5v18H3V3h18zm-1 1H4v16h16V4z"/></svg>
+        Shorts
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg>
+        Subscriptions
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">You ›</div>
+      <a class="nav-item" href="#">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+        Your channel
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M14.5 2.5c0 1.5-1.5 7-1.5 7h-2C10.5 9.5 9 4 9 2.5a2.5 2.5 0 015 0zM12 17c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm8.5-10h-17C2.67 7 2 7.67 2 8.5c0 .54.29 1.01.73 1.27L11 15.28V21h2v-5.72l8.27-5.51c.44-.26.73-.73.73-1.27 0-.83-.67-1.5-1.5-1.5z"/></svg>
+        History
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M22 13h-4v4h-2v-4h-4v-2h4V7h2v4h4v2zm-8-6H2v2h12V7zM2 11v2h8v-2H2zm0 6h8v-2H2v2z"/></svg>
+        Playlists
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+        Watch later
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        Liked videos
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Subscriptions</div>
+      <a class="nav-item" href="#">
+        <img src="https://i.pravatar.cc/36?img=1" style="width:24px;height:24px;border-radius:50%;object-fit:cover;" alt="">
+        Fireship
+      </a>
+      <a class="nav-item" href="#">
+        <img src="https://i.pravatar.cc/36?img=3" style="width:24px;height:24px;border-radius:50%;object-fit:cover;" alt="">
+        Traversy Media
+      </a>
+      <a class="nav-item" href="#">
+        <img src="https://i.pravatar.cc/36?img=5" style="width:24px;height:24px;border-radius:50%;object-fit:cover;" alt="">
+        Theo - t3.gg
+      </a>
+      <a class="nav-item" href="#">
+        <img src="https://i.pravatar.cc/36?img=7" style="width:24px;height:24px;border-radius:50%;object-fit:cover;" alt="">
+        NetworkChuck
+      </a>
+      <a class="nav-item" href="#">
+        <img src="https://i.pravatar.cc/36?img=9" style="width:24px;height:24px;border-radius:50%;object-fit:cover;" alt="">
+        The Primeagen
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Explore</div>
+      <a class="nav-item" href="#">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+        Music
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12zm-5-6l-7 4V7z"/></svg>
+        Gaming
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h8v2H6zm10 0h2v2h-2zm-6-4h8v2h-8z"/></svg>
+        News
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+        Live
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main>
+    <!-- Filter chips -->
+    <div class="chips">
+      <button class="chip active">All</button>
+      <button class="chip">Gaming</button>
+      <button class="chip">JavaScript</button>
+      <button class="chip">Music</button>
+      <button class="chip">Python</button>
+      <button class="chip">Live</button>
+      <button class="chip">Podcasts</button>
+      <button class="chip">React</button>
+      <button class="chip">Cooking</button>
+      <button class="chip">News</button>
+      <button class="chip">Recently uploaded</button>
+      <button class="chip">Watched</button>
+    </div>
+
+    <!-- Video Grid -->
+    <div class="video-grid">
+
+      <!-- Card 1 -->
+      <div class="video-card">
+        <div class="thumbnail">
+          <img src="https://picsum.photos/seed/a1/480/270" alt="video thumbnail" loading="lazy"/>
+          <span class="duration">12:34</span>
+        </div>
+        <div class="video-info">
+          <div class="channel-avatar"><img src="https://i.pravatar.cc/36?img=1" alt=""/></div>
+          <div class="video-meta">
+            <div class="video-title">I built a full-stack app in 10 minutes with AI assistance</div>
+            <div class="channel-name">Fireship <span class="verified"><svg viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg></span></div>
+            <div class="video-stats">4.2M views · 3 days ago</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="video-card">
+        <div class="thumbnail">
+          <img src="https://picsum.photos/seed/b2/480/270" alt="video thumbnail" loading="lazy"/>
+          <span class="duration">45:12</span>
+        </div>
+        <div class="video-info">
+          <div class="channel-avatar"><img src="https://i.pravatar.cc/36?img=3" alt=""/></div>
+          <div class="video-meta">
+            <div class="video-title">Complete Python Crash Course for Absolute Beginners 2024</div>
+            <div class="channel-name">Traversy Media <span class="verified"><svg viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg></span></div>
+            <div class="video-stats">1.8M views · 1 week ago</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 - LIVE -->
+      <div class="video-card">
+        <div class="thumbnail">
+          <img src="https://picsum.photos/seed/c3/480/270" alt="video thumbnail" loading="lazy"/>
+          <span class="live-badge">● LIVE</span>
+        </div>
+        <div class="video-info">
+          <div class="channel-avatar"><img src="https://i.pravatar.cc/36?img=5" alt=""/></div>
+          <div class="video-meta">
+            <div class="video-title">Building a SaaS Product Live — Day 12</div>
+            <div class="channel-name">Theo - t3.gg</div>
+            <div class="video-stats">8.4K watching now</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="video-card">
+        <div class="thumbnail">
+          <img src="https://picsum.photos/seed/d4/480/270" alt="video thumbnail" loading="lazy"/>
+          <span class="duration">22:07</span>
+        </div>
+        <div class="video-info">
+          <div class="channel-avatar"><img src="https://i.pravatar.cc/36?img=7" alt=""/></div>
+          <div class="video-meta">
+            <div class="video-title">Why Linux is BETTER for programmers (not clickbait)</div>
+            <div class="channel-name">NetworkChuck <span class="verified"><svg viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg></span></div>
+            <div class="video-stats">980K views · 2 weeks ago</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="video-card">
+        <div class="thumbnail">
+          <img src="https://picsum.photos/seed/e5/480/270" alt="video thumbnail" loading="lazy"/>
+          <span class="duration">8:55</span>
+        </div>
+        <div class="video-info">
+          <div class="channel-avatar"><img src="https://i.pravatar.cc/36?img=9" alt=""/></div>
+          <div class="video-meta">
+            <div class="video-title">Rust is Eating the World (And I'm Here For It)</div>
+            <div class="channel-name">The Primeagen <span class="verified"><svg viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg></span></div>
+            <div class="video-stats">2.1M views · 5 days ago</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="video-card">
+        <div class="thumbnail">
+          <img src="https://picsum.photos/seed/f6/480/270" alt="video thumbnail" loading="lazy"/>
+          <span class="duration">1:04:33</span>
+        </div>
+        <div class="video-info">
+          <div class="channel-avatar"><img src="https://i.pravatar.cc/36?img=11" alt=""/></div>
+          <div class="video-meta">
+            <div class="video-title">React 19 is HERE — What You Need to Know Right Now</div>
+            <div class="channel-name">Web Dev Simplified <span class="verified"><svg viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg></span></div>
+            <div class="video-stats">3.3M views · 1 month ago</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 7 -->
+      <div class="video-card">
+        <div class="thumbnail">
+          <img src="https://picsum.photos/seed/g7/480/270" alt="video thumbnail" loading="lazy"/>
+          <span class="duration">19:42</span>
+        </div>
+        <div class="video-info">
+          <div class="channel-avatar"><img src="https://i.pravatar.cc/36?img=13" alt=""/></div>
+          <div class="video-meta">
+            <div class="video-title">I Replaced My Entire Backend With Bun — Here's What Happened</div>
+            <div class="channel-name">Coding Garden</div>
+            <div class="video-stats">450K views · 3 weeks ago</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 8 -->
+      <div class="video-card">
+        <div class="thumbnail">
+          <img src="https://picsum.photos/seed/h8/480/270" alt="video thumbnail" loading="lazy"/>
+          <span class="duration">33:18</span>
+        </div>
+        <div class="video-info">
+          <div class="channel-avatar"><img src="https://i.pravatar.cc/36?img=15" alt=""/></div>
+          <div class="video-meta">
+            <div class="video-title">CSS Grid vs Flexbox — When to Use Each One (2024 Guide)</div>
+            <div class="channel-name">Kevin Powell <span class="verified"><svg viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg></span></div>
+            <div class="video-stats">5.7M views · 2 months ago</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 9 -->
+      <div class="video-card">
+        <div class="thumbnail">
+          <img src="https://picsum.photos/seed/i9/480/270" alt="video thumbnail" loading="lazy"/>
+          <span class="duration">16:20</span>
+        </div>
+        <div class="video-info">
+          <div class="channel-avatar"><img src="https://i.pravatar.cc/36?img=17" alt=""/></div>
+          <div class="video-meta">
+            <div class="video-title">TypeScript Advanced Patterns That Will Make You a Better Dev</div>
+            <div class="channel-name">Matt Pocock <span class="verified"><svg viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg></span></div>
+            <div class="video-stats">720K views · 4 days ago</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 10 -->
+      <div class="video-card">
+        <div class="thumbnail">
+          <img src="https://picsum.photos/seed/j10/480/270" alt="video thumbnail" loading="lazy"/>
+          <span class="duration">28:50</span>
+        </div>
+        <div class="video-info">
+          <div class="channel-avatar"><img src="https://i.pravatar.cc/36?img=19" alt=""/></div>
+          <div class="video-meta">
+            <div class="video-title">Docker & Kubernetes in 30 Minutes — No Prior Experience Needed</div>
+            <div class="channel-name">TechWorld with Nana <span class="verified"><svg viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg></span></div>
+            <div class="video-stats">6.1M views · 6 months ago</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 11 -->
+      <div class="video-card">
+        <div class="thumbnail">
+          <img src="https://picsum.photos/seed/k11/480/270" alt="video thumbnail" loading="lazy"/>
+          <span class="duration">10:04</span>
+        </div>
+        <div class="video-info">
+          <div class="channel-avatar"><img src="https://i.pravatar.cc/36?img=21" alt=""/></div>
+          <div class="video-meta">
+            <div class="video-title">Why Every Senior Dev Uses Neovim (And You Should Too)</div>
+            <div class="channel-name">Dreams of Code</div>
+            <div class="video-stats">312K views · 2 weeks ago</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 12 -->
+      <div class="video-card">
+        <div class="thumbnail">
+          <img src="https://picsum.photos/seed/l12/480/270" alt="video thumbnail" loading="lazy"/>
+          <span class="duration">55:00</span>
+        </div>
+        <div class="video-info">
+          <div class="channel-avatar"><img src="https://i.pravatar.cc/36?img=23" alt=""/></div>
+          <div class="video-meta">
+            <div class="video-title">The Future of AI in 2025 — What Developers Need to Prepare For</div>
+            <div class="channel-name">Lex Fridman <span class="verified"><svg viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg></span></div>
+            <div class="video-stats">11M views · 1 year ago</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /video-grid -->
+  </main>
+</div>
+
+<script>
+  // Chip active toggle
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
